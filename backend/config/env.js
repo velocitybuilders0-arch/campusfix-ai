@@ -3,13 +3,14 @@ const path = require('path');
 
 dotenv.config({ path: path.resolve(__dirname, '..', '.env') });
 
-const required = ['SUPABASE_URL', 'SUPABASE_ANON_KEY'];
-const missing = required.filter((key) => !process.env[key]);
+// Variables that the backend needs for its intended features to work.
+const recommended = ['SUPABASE_URL', 'SUPABASE_ANON_KEY'];
+const missing = recommended.filter((key) => !process.env[key]);
 
 if (missing.length > 0) {
   console.warn(
     `[env] Warning: missing environment variables: ${missing.join(', ')}. ` +
-      'Database features will not work until these are set.'
+      'Database and auth features will not work until these are set.'
   );
 }
 
