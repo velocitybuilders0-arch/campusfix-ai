@@ -1,9 +1,11 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import PageHeader from '../../components/layout/PageHeader';
+import AIClassificationCard from '../../components/issues/AIClassificationCard';
 import Button from '../../components/ui/Button';
 import ErrorState from '../../components/ui/ErrorState';
 import FormField from '../../components/ui/FormField';
+import ImageUpload from '../../components/ui/ImageUpload';
 import SuccessToast from '../../components/ui/SuccessToast';
 import { analyzeIssue, createIssue } from '../../api/endpoints';
 import { analyzeFixtureResponse } from '../../api/fixtures/analyze.fixture';
@@ -19,6 +21,8 @@ const emptyErrors = {
   description: '',
   image: '',
 };
+
+const USE_FIXTURES = import.meta.env.VITE_USE_FIXTURES === 'true';
 
 function NewIssue() {
   const navigate = useNavigate();
@@ -37,10 +41,24 @@ function NewIssue() {
     setErrors((previous) => ({ ...previous, [name]: '' }));
   };
 
-  const handleImageChange = (event) => {
-    const nextFile = event.target.files?.[0] || null;
+  const handleImageChange = (nextFile) => {
     setFormData((previous) => ({ ...previous, image: nextFile }));
     setErrors((previous) => ({ ...previous, image: '' }));
+  };
+
+  const buildPayload = () => {
+    const title = formData.title.trim();
+    const description = formData.description.trim();
+
+    if (!formData.image) {
+      return { title, description };
+    }
+
+    const form = new FormData();
+    form.append('title', title);
+    form.append('description', description);
+    form.append('image', formData.image);
+    return form;
   };
 
   const validate = () => {
@@ -66,7 +84,6 @@ function NewIssue() {
 
   const handleAnalyze = async () => {
     setAnalysisError('');
-    const isFixtureMode = import.meta.env.VITE_USE_FIXTURES === 'true';
 
     if (!formData.title.trim() || !formData.description.trim()) {
       setErrors({
@@ -80,24 +97,13 @@ function NewIssue() {
     setIsAnalyzing(true);
 
     try {
-      if (isFixtureMode) {
+      if (USE_FIXTURES) {
         // TEMPORARY fixture branch — remove when backend /api/ai/analyze is live.
         setAnalysisResult(analyzeFixtureResponse.data);
         return;
       }
 
-      const payload = formData.image
-        ? (() => {
-            const form = new FormData();
-            form.append('title', formData.title.trim());
-            form.append('description', formData.description.trim());
-            form.append('image', formData.image);
-            return form;
-          })()
-        : {
-            title: formData.title.trim(),
-            description: formData.description.trim(),
-          };
+      const payload = buildPayload();
 
       const response = await analyzeIssue(payload);
       setAnalysisResult(response.data || response);
@@ -116,32 +122,20 @@ function NewIssue() {
       return;
     }
 
-    const isFixtureMode = import.meta.env.VITE_USE_FIXTURES === 'true';
     setIsSubmitting(true);
 
     try {
-      if (isFixtureMode) {
+      if (USE_FIXTURES) {
         setSuccessMessage('Issue submitted successfully.');
-        navigate('/student/issues');
+        setTimeout(() => navigate('/student/issues'), 800);
         return;
       }
 
-      const payload = formData.image
-        ? (() => {
-            const form = new FormData();
-            form.append('title', formData.title.trim());
-            form.append('description', formData.description.trim());
-            form.append('image', formData.image);
-            return form;
-          })()
-        : {
-            title: formData.title.trim(),
-            description: formData.description.trim(),
-          };
+      const payload = buildPayload();
 
       await createIssue(payload);
       setSuccessMessage('Issue submitted successfully.');
-      navigate('/student/issues');
+      setTimeout(() => navigate('/student/issues'), 800);
     } catch (error) {
       setSubmitError(error.message || 'Unable to submit the issue right now.');
     } finally {
@@ -180,13 +174,13 @@ function NewIssue() {
         </FormField>
 
         <FormField label="Image" htmlFor="issue-image" error={errors.image}>
-          <input
+          <ImageUpload
             id="issue-image"
-            name="image"
-            type="file"
-            accept="image/*"
+            value={formData.image}
             onChange={handleImageChange}
-            aria-invalid={Boolean(errors.image)}
+            accept="image/*"
+            maxSizeMB={5}
+            error={errors.image}
           />
         </FormField>
 
@@ -201,27 +195,13 @@ function NewIssue() {
         </div>
       </form>
 
-      {analysisError ? (
+      {(isAnalyzing || analysisResult || analysisError) ? (
         <div style={{ marginTop: '1rem' }}>
-          <ErrorState title="AI analysis failed" message={analysisError} />
-        </div>
-      ) : null}
-
-      {analysisResult ? (
-        <div className="card issue-card" style={{ marginTop: '1rem' }} role="status">
-          <h3>AI suggestion</h3>
-          <p>
-            <strong>Category:</strong> {analysisResult.category}
-          </p>
-          <p>
-            <strong>Priority:</strong> {analysisResult.priority}
-          </p>
-          <p>
-            <strong>Department:</strong> {analysisResult.department}
-          </p>
-          <p>
-            <strong>Summary:</strong> {analysisResult.summary}
-          </p>
+          <AIClassificationCard
+            data={analysisResult}
+            loading={isAnalyzing}
+            error={analysisError}
+          />
         </div>
       ) : null}
 
