@@ -761,3 +761,36 @@ img {
 .ai-card__skeleton-row {
   height: 14px;
 }
+
+/* Phase 2 — StudentHome dashboard */
+.dashboard-recent {
+  margin-top: var(--space-6);
+}
+
+.dashboard-recent__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: var(--space-4);
+}
+
+.dashboard-recent__title {
+  font-size: 1.1rem;
+  margin: 0;
+}
+
+.dashboard-recent__grid {
+  display: grid;
+  gap: var(--space-4);
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+}
+
+.dashboard-recent__footer {
+  margin-top: var(--space-4);
+  text-align: right;
+}
+
+.dashboard-recent__viewall {
+  color: var(--color-primary);
+  font-weight: 600;
+}
