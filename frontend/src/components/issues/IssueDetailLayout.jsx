@@ -1,0 +1,59 @@
+import Badge from '../ui/Badge';
+import Timeline from '../ui/Timeline';
+import CategoryTag from './CategoryTag';
+import IssueStatusBadge from './IssueStatusBadge';
+import PriorityIndicator from './PriorityIndicator';
+
+function IssueDetailLayout({ issue }) {
+  if (!issue) {
+    return null;
+  }
+
+  return (
+    <div className="layout-grid">
+      <section className="card issue-card">
+        <div className="issue-card__header">
+          <h2 className="issue-card__title">{issue.title}</h2>
+          <IssueStatusBadge status={issue.status} />
+        </div>
+
+        <div className="issue-card__meta">
+          <span>{issue.id}</span>
+          <CategoryTag category={issue.category} />
+          <PriorityIndicator priority={issue.priority} />
+          <span>{issue.createdAt ? `Reported ${new Date(issue.createdAt).toLocaleDateString()}` : 'Reported recently'}</span>
+        </div>
+
+        <p className="issue-card__description">{issue.description}</p>
+
+        {issue.imageUrl ? (
+          <img
+            src={issue.imageUrl}
+            alt="Issue attachment"
+            className="issue-card__image"
+          />
+        ) : null}
+      </section>
+
+      <aside className="card issue-card">
+        <h3>Issue summary</h3>
+        <div className="issue-card__meta">
+          {issue.department ? <Badge variant="muted">{issue.department}</Badge> : null}
+          <Badge variant="muted">{issue.userName || issue.userId || 'Student report'}</Badge>
+        </div>
+        {issue.aiSummary ? <p><strong>AI summary:</strong> {issue.aiSummary}</p> : null}
+        <p><strong>Priority:</strong> {issue.priority}</p>
+        <p><strong>Status:</strong> {issue.status}</p>
+        <p>
+          <strong>Updated:</strong>{' '}
+          {issue.updatedAt ? new Date(issue.updatedAt).toLocaleString() : '—'}
+        </p>
+
+        <h3>Activity</h3>
+        <Timeline items={issue.updates || []} />
+      </aside>
+    </div>
+  );
+}
+
+export default IssueDetailLayout;
