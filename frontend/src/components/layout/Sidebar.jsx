@@ -9,7 +9,7 @@ function Sidebar() {
           Home
         </NavLink>
         <NavLink className={({ isActive }) => `sidebar__link ${isActive ? 'sidebar__link--active' : ''}`.trim()} to="/student/new">
-          Submit issue
+          Report an issue
         </NavLink>
         <NavLink className={({ isActive }) => `sidebar__link ${isActive ? 'sidebar__link--active' : ''}`.trim()} to="/student/issues">
           My issues

@@ -4,19 +4,14 @@ import Card from '../../components/ui/Card';
 function AdminDashboard() {
   return (
     <>
-      <PageHeader title="Admin dashboard" subtitle="Placeholder dashboard for Phase 1." />
+      <PageHeader title="Admin dashboard" subtitle="Overview of campus issues and resolution activity." />
       <div className="grid">
-        <Card className="issue-card">
-          <h3>Pending assignments</h3>
-          <p>4 issues awaiting review.</p>
-        </Card>
-        <Card className="issue-card">
-          <h3>Resolved today</h3>
-          <p>6 issues closed successfully.</p>
-        </Card>
-        <Card className="issue-card">
-          <h3>Escalations</h3>
-          <p>2 items require managerial review.</p>
+        <Card>
+          <h3>Admin tools coming online</h3>
+          <p>
+            Live statistics and management tools will appear here once the
+            backend is connected.
+          </p>
         </Card>
       </div>
     </>

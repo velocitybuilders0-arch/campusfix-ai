@@ -11,7 +11,9 @@ function FilterBar({ filters, options, onChange, onClear }) {
             value={filter.value || ''}
             onChange={(e) => onChange(filter.key, e.target.value)}
           >
-            <option value="">All {filter.label.toLowerCase()}s</option>
+            <option value="">
+              {filter.allLabel || `All ${filter.label.toLowerCase()}`}
+            </option>
             {(options[filter.key] || []).map((opt) => (
               <option key={opt.value} value={opt.value}>{opt.label}</option>
             ))}
