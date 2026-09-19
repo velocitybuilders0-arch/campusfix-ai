@@ -21,7 +21,7 @@ function IssueDetailLayout({ issue }) {
           <span>{issue.id}</span>
           <CategoryTag category={issue.category} />
           <PriorityIndicator priority={issue.priority} />
-          <span>{issue.location}</span>
+          <span>{issue.createdAt ? `Reported ${new Date(issue.createdAt).toLocaleDateString()}` : 'Reported recently'}</span>
         </div>
 
         <p className="issue-card__description">{issue.description}</p>
@@ -38,9 +38,10 @@ function IssueDetailLayout({ issue }) {
       <aside className="card issue-card">
         <h3>Issue summary</h3>
         <div className="issue-card__meta">
-          <Badge variant="muted">{issue.department}</Badge>
-          <Badge variant="muted">{issue.studentName}</Badge>
+          {issue.department ? <Badge variant="muted">{issue.department}</Badge> : null}
+          <Badge variant="muted">{issue.userName || issue.userId || 'Student report'}</Badge>
         </div>
+        {issue.aiSummary ? <p><strong>AI summary:</strong> {issue.aiSummary}</p> : null}
         <p><strong>Priority:</strong> {issue.priority}</p>
         <p><strong>Status:</strong> {issue.status}</p>
         <p>

@@ -3,7 +3,7 @@ import IssueStatusBadge from './IssueStatusBadge';
 import PriorityIndicator from './PriorityIndicator';
 import CategoryTag from './CategoryTag';
 
-function IssueCard({ issue }) {
+function IssueCard({ issue, basePath = '/student' }) {
   return (
     <article className="card issue-card">
       <div className="issue-card__header">
@@ -20,8 +20,8 @@ function IssueCard({ issue }) {
       <p className="issue-card__description">{issue.description}</p>
 
       <div className="issue-card__meta">
-        <span>{issue.location}</span>
-        <Link to={`/student/issues/${issue.id}`}>View details</Link>
+        <span>{issue.updatedAt ? `Updated ${new Date(issue.updatedAt).toLocaleDateString()}` : 'Recently reported'}</span>
+        <Link to={`${basePath}/issues/${issue.id}`}>View details</Link>
       </div>
     </article>
   );

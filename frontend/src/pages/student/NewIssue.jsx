@@ -5,7 +5,6 @@ import AIClassificationCard from '../../components/issues/AIClassificationCard';
 import Button from '../../components/ui/Button';
 import ErrorState from '../../components/ui/ErrorState';
 import FormField from '../../components/ui/FormField';
-import ImageUpload from '../../components/ui/ImageUpload';
 import SuccessToast from '../../components/ui/SuccessToast';
 import { analyzeIssue, createIssue } from '../../api/endpoints';
 import { analyzeFixtureResponse } from '../../api/fixtures/analyze.fixture';
@@ -13,13 +12,11 @@ import { analyzeFixtureResponse } from '../../api/fixtures/analyze.fixture';
 const initialState = {
   title: '',
   description: '',
-  image: null,
 };
 
 const emptyErrors = {
   title: '',
   description: '',
-  image: '',
 };
 
 const USE_FIXTURES = import.meta.env.VITE_USE_FIXTURES === 'true';
@@ -41,24 +38,10 @@ function NewIssue() {
     setErrors((previous) => ({ ...previous, [name]: '' }));
   };
 
-  const handleImageChange = (nextFile) => {
-    setFormData((previous) => ({ ...previous, image: nextFile }));
-    setErrors((previous) => ({ ...previous, image: '' }));
-  };
-
   const buildPayload = () => {
     const title = formData.title.trim();
     const description = formData.description.trim();
-
-    if (!formData.image) {
-      return { title, description };
-    }
-
-    const form = new FormData();
-    form.append('title', title);
-    form.append('description', description);
-    form.append('image', formData.image);
-    return form;
+    return { title, description };
   };
 
   const validate = () => {
@@ -89,7 +72,6 @@ function NewIssue() {
       setErrors({
         title: formData.title.trim() ? '' : 'Title is required.',
         description: formData.description.trim() ? '' : 'Description is required.',
-        image: '',
       });
       return;
     }
@@ -173,16 +155,7 @@ function NewIssue() {
           />
         </FormField>
 
-        <FormField label="Image" htmlFor="issue-image" error={errors.image}>
-          <ImageUpload
-            id="issue-image"
-            value={formData.image}
-            onChange={handleImageChange}
-            accept="image/*"
-            maxSizeMB={5}
-            error={errors.image}
-          />
-        </FormField>
+        <p className="page__subtitle">Image attachments are not available until backend storage support is connected.</p>
 
         <div style={{ marginTop: '1rem', display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
           <Button type="button" onClick={handleAnalyze} disabled={isAnalyzing}>

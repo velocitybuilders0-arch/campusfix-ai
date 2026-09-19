@@ -1,3 +1,5 @@
+import { supabase } from '../lib/supabase';
+
 class ApiError extends Error {
   constructor(message, details = null) {
     super(message);
@@ -19,12 +21,33 @@ async function request(path, options = {}) {
 
   const { method = 'GET', body, headers = {}, ...rest } = options;
   const isFormData = typeof FormData !== 'undefined' && body instanceof FormData;
+  let sessionData;
+
+  try {
+    sessionData = await supabase.auth.getSession();
+  } catch (error) {
+    throw new ApiError('Unable to verify your authentication session. Please sign in again.', error.message);
+  }
+
+  const { data, error } = sessionData;
+
+  if (error) {
+    throw new ApiError('Unable to verify your authentication session. Please sign in again.', error.message);
+  }
+
+  const accessToken = data.session?.access_token;
+
+  if (!accessToken) {
+    throw new ApiError('Authentication is required. Please sign in before making this request.');
+  }
 
   let response;
   try {
     response = await fetch(`${baseUrl}${path}`, {
       method,
-      headers: isFormData ? { ...headers } : { 'Content-Type': 'application/json', ...headers },
+      headers: isFormData
+        ? { ...headers, Authorization: `Bearer ${accessToken}` }
+        : { 'Content-Type': 'application/json', ...headers, Authorization: `Bearer ${accessToken}` },
       body: isFormData ? body : body != null ? JSON.stringify(body) : undefined,
       ...rest,
     });
@@ -37,6 +60,12 @@ async function request(path, options = {}) {
 
   if (!response.ok) {
     const errorText = await response.text();
+
+    if (response.status === 401) {
+      await supabase.auth.signOut();
+      throw new ApiError('Your session has expired. Please sign in again.', errorText);
+    }
+
     throw new ApiError(`Request failed: ${response.status} ${response.statusText}`, errorText);
   }
 

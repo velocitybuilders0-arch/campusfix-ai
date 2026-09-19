@@ -67,6 +67,35 @@ img {
   padding: var(--space-6);
 }
 
+.auth-page {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: var(--space-5);
+}
+
+.auth-card {
+  width: min(100%, 440px);
+  padding: var(--space-6);
+}
+
+.auth-card h1 {
+  margin-top: 0;
+}
+
+.auth-card form {
+  display: grid;
+  gap: var(--space-4);
+  margin-top: var(--space-6);
+}
+
+.auth-loading {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  color: var(--color-text-soft);
+}
+
 .page__header {
   display: flex;
   justify-content: space-between;

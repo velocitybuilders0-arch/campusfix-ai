@@ -64,9 +64,8 @@ async function create(req, res, next) {
   try {
     const body = validateCreateIssueBody(req.body);
 
-    // AI enrichment (optional). If AI is unavailable we still create the
-    // issue with whatever fields the client provided. This mirrors the
-    // approved flow: analyze → store. We never fabricate AI fields.
+    // AI enrichment is authoritative for classification fields. If AI is
+    // unavailable, leave those fields null rather than trusting client input.
     let aiFields = {};
     if (aiAdapter.isAvailable()) {
       try {
@@ -91,10 +90,10 @@ async function create(req, res, next) {
       title: body.title,
       description: body.description,
       image_url: body.image_url ?? null,
-      category: body.category ?? aiFields.category ?? null,
-      priority: body.priority ?? aiFields.priority ?? null,
-      department: body.department ?? aiFields.department ?? null,
-      ai_summary: body.ai_summary ?? aiFields.ai_summary ?? null,
+      category: aiFields.category ?? null,
+      priority: aiFields.priority ?? null,
+      department: aiFields.department ?? null,
+      ai_summary: aiFields.ai_summary ?? null,
       status: 'OPEN'
     };
 
