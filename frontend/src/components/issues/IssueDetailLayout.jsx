@@ -1,4 +1,5 @@
 import Badge from '../ui/Badge';
+import Timeline from '../ui/Timeline';
 import CategoryTag from './CategoryTag';
 import IssueStatusBadge from './IssueStatusBadge';
 import PriorityIndicator from './PriorityIndicator';
@@ -24,6 +25,14 @@ function IssueDetailLayout({ issue }) {
         </div>
 
         <p className="issue-card__description">{issue.description}</p>
+
+        {issue.imageUrl ? (
+          <img
+            src={issue.imageUrl}
+            alt="Issue attachment"
+            className="issue-card__image"
+          />
+        ) : null}
       </section>
 
       <aside className="card issue-card">
@@ -34,7 +43,13 @@ function IssueDetailLayout({ issue }) {
         </div>
         <p><strong>Priority:</strong> {issue.priority}</p>
         <p><strong>Status:</strong> {issue.status}</p>
-        <p><strong>Updated:</strong> {new Date(issue.updatedAt).toLocaleString()}</p>
+        <p>
+          <strong>Updated:</strong>{' '}
+          {issue.updatedAt ? new Date(issue.updatedAt).toLocaleString() : '—'}
+        </p>
+
+        <h3>Activity</h3>
+        <Timeline items={issue.updates || []} />
       </aside>
     </div>
   );

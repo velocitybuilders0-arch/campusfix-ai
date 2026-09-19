@@ -758,6 +758,15 @@ img {
   gap: var(--space-2);
 }
 
+/* Phase 2 — Issue details */
+.issue-card__image {
+  margin-top: var(--space-4);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--color-border);
+  max-height: 320px;
+  object-fit: cover;
+}
+
 .error-state__title {
   margin: 0 0 var(--space-2) 0;
 }

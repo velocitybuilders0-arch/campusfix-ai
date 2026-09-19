@@ -1,49 +1,82 @@
 import { useCallback, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import { getIssue } from '../../api/endpoints';
 import { issuesFixture } from '../../api/fixtures/issues.fixture';
 import IssueDetailLayout from '../../components/issues/IssueDetailLayout';
+import EmptyState from '../../components/ui/EmptyState';
 import ErrorState from '../../components/ui/ErrorState';
 import Spinner from '../../components/ui/Spinner';
 import { ASYNC, useAsyncState } from '../../hooks/useAsyncState';
 
+const USE_FIXTURES = import.meta.env.VITE_USE_FIXTURES === 'true';
+
 function IssueDetails() {
   const { issueId } = useParams();
-  const useFixtures = import.meta.env.VITE_USE_FIXTURES === 'true';
 
   const fetchIssue = useCallback(async () => {
-    if (useFixtures) {
+    if (USE_FIXTURES) {
       // TEMPORARY fixture branch — remove when backend is live.
-      await new Promise((resolve) => {
-        setTimeout(resolve, 150);
-      });
+      await new Promise((resolve) => setTimeout(resolve, 150));
       return issuesFixture.find((item) => item.id === issueId) || null;
     }
-
     return getIssue(issueId);
-  }, [issueId, useFixtures]);
+  }, [issueId]);
 
   const { data: issue, loading, error, state, run } = useAsyncState(fetchIssue, null);
 
   useEffect(() => {
     if (issueId) {
-      run();
+      run().catch(() => {});
     }
   }, [issueId, run]);
 
+  const backLink = (
+    <p style={{ marginBottom: '1rem' }}>
+      <Link to="/student/issues">← Back to issues</Link>
+    </p>
+  );
+
   if (loading || state === ASYNC.IDLE) {
-    return <Spinner label="Loading issue..." />;
+    return (
+      <>
+        {backLink}
+        <Spinner label="Loading issue…" />
+      </>
+    );
   }
 
   if (state === ASYNC.ERROR || error) {
-    return <ErrorState title="Issue could not be loaded" message={error?.message || 'Unable to load issue details.'} />;
+    return (
+      <>
+        {backLink}
+        <ErrorState
+          title="Could not load issue"
+          message={error?.message || 'Unable to load issue details.'}
+          onRetry={() => { run().catch(() => {}); }}
+        />
+      </>
+    );
   }
 
   if (!issue) {
-    return <ErrorState title="Issue not found" message={`No issue exists for ${issueId}.`} />;
+    return (
+      <>
+        {backLink}
+        <EmptyState
+          title="Issue not found"
+          description={`No issue exists for ${issueId}.`}
+          action={<Link to="/student/issues">Back to My Issues</Link>}
+        />
+      </>
+    );
   }
 
-  return <IssueDetailLayout issue={issue} />;
+  return (
+    <>
+      {backLink}
+      <IssueDetailLayout issue={issue} />
+    </>
+  );
 }
 
 export default IssueDetails;
