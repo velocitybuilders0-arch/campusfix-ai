@@ -20,12 +20,20 @@ async function request(path, options = {}) {
   const { method = 'GET', body, headers = {}, ...rest } = options;
   const isFormData = typeof FormData !== 'undefined' && body instanceof FormData;
 
-  const response = await fetch(`${baseUrl}${path}`, {
-    method,
-    headers: isFormData ? { ...headers } : { 'Content-Type': 'application/json', ...headers },
-    body: isFormData ? body : body != null ? JSON.stringify(body) : undefined,
-    ...rest,
-  });
+  let response;
+  try {
+    response = await fetch(`${baseUrl}${path}`, {
+      method,
+      headers: isFormData ? { ...headers } : { 'Content-Type': 'application/json', ...headers },
+      body: isFormData ? body : body != null ? JSON.stringify(body) : undefined,
+      ...rest,
+    });
+  } catch (networkError) {
+    throw new ApiError(
+      'Could not reach the CampusFix backend. It may be offline.',
+      { cause: networkError },
+    );
+  }
 
   if (!response.ok) {
     const errorText = await response.text();
