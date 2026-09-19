@@ -758,6 +758,15 @@ img {
   gap: var(--space-2);
 }
 
+.error-state__title {
+  margin: 0 0 var(--space-2) 0;
+}
+
+.error-state__message {
+  margin: 0 0 var(--space-4) 0;
+  color: var(--color-text-soft);
+}
+
 .ai-card__skeleton-row {
   height: 14px;
 }
@@ -793,4 +802,28 @@ img {
 .dashboard-recent__viewall {
   color: var(--color-primary);
   font-weight: 600;
+}
+
+/* Phase 2 — MyIssues page */
+.issues-toolbar {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin-bottom: var(--space-5);
+}
+
+.issues-toolbar__search {
+  max-width: 420px;
+}
+
+.issues-grid {
+  display: grid;
+  gap: var(--space-4);
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+}
+
+@media (max-width: 767px) {
+  .issues-toolbar__search {
+    max-width: 100%;
+  }
 }
